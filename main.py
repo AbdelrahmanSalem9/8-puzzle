@@ -10,7 +10,7 @@ def generate_childs(state):
     index = state.index("0")
     childs = []
 
-
+    #ay haga
     # if index == 0:
     #     childs.append(swap(state, index, 1))
     #     childs.append(swap(state, index, 3))
