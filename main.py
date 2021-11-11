@@ -215,7 +215,7 @@ if __name__ == '__main__':
     # elif alg == 3:
     #     game = a_star_md(initial_state)
 
-    # game = a_star_ed("182043765")
-    game2 = a_star_ed("013425786")
+    game = a_star_ed("182043765")
+    # game2 = a_star_ed("013425786")
 
-    print_path(game2)
+    print_path(game)
