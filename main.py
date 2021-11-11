@@ -1,4 +1,6 @@
+import time
 from math import sqrt
+
 from heapdict import heapdict
 
 
@@ -38,7 +40,7 @@ def generate_children(state):
 
 
 # printing the state in 3x3 board
-def print_path(game):
+def print_path(game, cost, nodes_explored, depth, time_taken):
     game = game[::-1]  # reverse the path
     for state in game:
         for i in range(9):
@@ -47,18 +49,39 @@ def print_path(game):
             else:
                 print(state[i], end=" ")
         print("---------------------------------------------")
+    print("Cost = " + str(cost))
+    print("Depth = " + str(depth - 1))
+    print("Nodes Explored = " + str(nodes_explored))
+    print("Running Time = " + str(time_taken))
+    # print("Cost = "+str(cost) + "  Nodes Explored = "+str(nodes_explored))
+
+
+# backtracking the path from the goal state to the initial state
+def find_path(parent_map, initial_state, nodes_explored, depth, time_taken):
+    current_state = "012345678"  # to get the parent of the goal state
+    path = [current_state]
+    cost = 0
+    while current_state != initial_state:
+        path.append(parent_map[current_state])
+        current_state = parent_map.get(current_state)
+        cost += 1
+    # return path
+    print_path(path, cost, nodes_explored, depth, time_taken)
 
 
 def bfs(initial_state):
+    start_time = time.time()
     frontier = [initial_state]
     explore = set()
     parent_map = {}
+    depth = 0
     while len(frontier) != 0:
         state = frontier.pop(0)
         explore.add(state)
+        depth += 1
 
         if state == "012345678":
-            return find_path(parent_map, initial_state)
+            return find_path(parent_map, initial_state, len(explore), depth, time.time() - start_time)
 
         else:
             for child in generate_children(state):
@@ -68,26 +91,18 @@ def bfs(initial_state):
     return []
 
 
-# backtracking the path from the goal state to the initial state
-def find_path(parent_map, initial_state):
-    current_state = "012345678"  # to get the parent of the goal state
-    path = [current_state]
-    while current_state != initial_state:
-        path.append(parent_map[current_state])
-        current_state = parent_map.get(current_state)
-    return path
-
-
 def dfs(initial_state):
+    start_time = time.time()
     frontier = [initial_state]
     explore = set()
     parent_map = {}
+    depth = 0
     while len(frontier) != 0:
         state = frontier.pop()  # Stack behaviour
         explore.add(state)
-
+        depth += 1
         if state == "012345678":
-            return find_path(parent_map, initial_state)
+            return find_path(parent_map, initial_state, len(explore), depth, time.time() - start_time)
         else:
             for child in generate_children(state):
                 if child not in frontier and child not in explore:
@@ -119,19 +134,22 @@ def euclidean_distance(state):
 
 
 def a_star_md(initial_state):
+    start_time = time.time()
+
     frontier = heapdict()
     frontier[initial_state] = get_state_manhattan_distance(initial_state)
 
     explored = set()
     parent_map = {}
-
+    depth = 0
     while len(frontier) > 0:
         prev_cost = frontier.peekitem()[1] - get_state_manhattan_distance(frontier.peekitem()[0])
         state = frontier.popitem()[0]
         explored.add(state)
+        depth += 1
 
         if state == "012345678":
-            return find_path(parent_map, initial_state)
+            return find_path(parent_map, initial_state, len(explored), depth, time.time() - start_time)
 
         for child in generate_children(state):
             if child not in frontier and child not in explored:
@@ -144,20 +162,23 @@ def a_star_md(initial_state):
 
 
 def a_star_ed(initial_state):
+    start_time = time.time()
     frontier = heapdict()  # optimized priority queue using hashing
     frontier[initial_state] = euclidean_distance(initial_state)
 
     explored = set()
     parent_map = {}
+    depth = 0
 
     while len(frontier) > 0:
         prev_cost = frontier.peekitem()[1] - euclidean_distance(
             frontier.peekitem()[0])  # to get the cost of the parent node
         state = frontier.popitem()[0]
         explored.add(state)
+        depth += 1
 
         if state == "012345678":
-            return find_path(parent_map, initial_state)
+            return find_path(parent_map, initial_state, len(explored), depth, time.time() - start_time)
 
         for child in generate_children(state):
             if child not in frontier and child not in explored:
@@ -184,11 +205,13 @@ def check_solvable(state):
 
 if __name__ == '__main__':
 
-    test_games = ["013425786", "125340678", "312045678", "182043765", "812045673"]  # Solvable initial states
+    test_games = ["013425786", "125340678", "312045678", "182043765", "812045673",
+                  "312045678"]  # Solvable initial states
     test_unsolvable = "812043765"
-    game = test_games[1]
+    game = test_games[5]
     if check_solvable(game):
-        solution = a_star_md(game)
-        print_path(solution)
+        dfs(game)
+        # print_path(solution)
+
     else:
         print("Not Solvable")
