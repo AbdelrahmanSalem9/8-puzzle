@@ -7,10 +7,11 @@ class Node:
     *********
     """
 
-    def __init__(self, state, index, parent=None, col=3):
+    def __init__(self, state, index, action = "initial_state", parent=None, col=3):
         self.state = state
         self.index = index
         self.parent = parent
+        self.action = action
         self.col = col
         if parent is None:
             self.depth = 0
@@ -20,7 +21,7 @@ class Node:
         # Children
         self.children = []
 
-    def isGoalState(self, goal=None):
+    def is_goal(self, goal=None):
         if goal is None:
             goal = "012345678"
         if self.state == goal:
@@ -29,62 +30,71 @@ class Node:
             return False
 
     #   Create children Nodes
-    def moveUp(self):
+    def move_up(self):
         index = self.index - self.col  # index - 3 < 0 => check if there is space to move up
         if index > 0:
-            newState = self.newState(index)
-            if newState != self.state:
-                self.children.append(Node(newState, index, self))
+            new_state = self.new_state(index)
+            if new_state != self.state:
+                self.children.append(Node(new_state, index, "up",self))
             else:
                 return None
 
-    def moveDown(self):
+    def move_down(self):
         index = self.index + self.col  # index + 3 < length => check if there is space to move down
         if index < len(self.state):
-            newState = self.newState(index)
-            if newState != self.state:
-                self.children.append(Node(newState, index, self))
+            new_state = self.new_state(index)
+            if new_state != self.state:
+                self.children.append(Node(new_state, index, "down",self))
             else:
                 return None
                 
-    def moveLeft(self):
+    def move_left(self):
         index = self.index - 1
         if self.index % self.col > 0:  # index % 3 < 2 => check if there is space to move left
-            newState = self.newState(index)
-            if newState != self.state:
-                self.children.append(Node(newState, index, self))
+            new_state = self.new_state(index)
+            if new_state != self.state:
+                self.children.append(Node(new_state, index, "left",self))
             else:
                 return None
 
-    def moveRight(self):
+    def move_right(self):
         index = self.index + 1
         if self.index % self.col < self.col - 1:  # index % 3 < 0 => check if there is space to move right
-            newState = self.newState(index)
-            if newState != self.state:
-                self.children.append(Node(newState, index, self))
+            new_state = self.new_state(index)
+            if new_state != self.state:
+                self.children.append(Node(new_state, index, "right",self))
             else:
                 return None
 
-    def newState(self, index):
+    def new_state(self, index):
         state = swap(self.state, self.index, index)
         return state
 
-    def move(self):
-        self.moveLeft()
-        self.moveRight()
-        self.moveUp()
-        self.moveDown()
+    def expand(self):
+        self.expand_left()
+        self.expand_right()
+        self.expand_up()
+        self.expand_down()
+        return self.children
 
-    def getState(self):
+    def get_state(self):
         return self.state
     
-    def getChildren(self):
+    def get_children(self):
         return self.children
         
-    def printState(self):
+    def print_state(self):
         print(self.state[0:self.col])
         print(self.state[self.col :self.col + self.col])
         print(self.state[self.col + self.col :len(self.state)])
+
+    def get_list_to_root(self, solutin_node):
+        temp = solutin_node
+        lst = [temp]
+        while temp.parent is not None:
+            temp = temp.parent
+            lst.append(temp)
+        return lst
 
 def swap(s, i, j):
     lst = list(s)
