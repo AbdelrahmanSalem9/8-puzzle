@@ -3,8 +3,6 @@ from heapdict import heapdict
 
 
 # move action function to swap between two tiles
-
-
 def swap(s, i, j):
     lst = list(s)
     lst[i], lst[j] = lst[j], lst[i]
@@ -16,6 +14,7 @@ def generate_children(state):
     children = []
 
     # Create children Nodes
+
     # Get index of empty tile
     index = state.index("0")
 
@@ -89,8 +88,6 @@ def dfs(initial_state):
 
         if state == "012345678":
             return find_path(parent_map, initial_state)
-
-
         else:
             for child in generate_children(state):
                 if child not in frontier and child not in explore:
@@ -101,29 +98,24 @@ def dfs(initial_state):
 
 def get_state_manhattan_distance(state):
     goal = "012345678"
-    sum = 0
+    manhattan_sum = 0
     for s in state:
-        sindex = state.find(s)
-        gindex = goal.find(s)
-        xs = sindex % 3
-        ys = int(sindex / 3)
-        xg = gindex % 3
-        yg = int(gindex / 3)
-        sum = sum + abs(xs - xg) + abs(ys - yg)
-    return sum
+        current_index = state.find(s)
+        goal_index = goal.find(s)
+        manhattan_sum = manhattan_sum + abs((current_index % 3) - (goal_index % 3)) + abs(
+            (current_index // 3) - (goal_index // 3))
+    return manhattan_sum
 
 
-def euclidesDistance(state, col=3):
-    h = 0
-    for c in state:
-        index = state.find(c)
-        target = int(c)
-        x_index = index % col
-        y_index = index // col
-        x_target = target % col
-        y_target = target // col
-        h = h + sqrt((x_index - x_target) ** 2 + (y_index - y_target) ** 2)
-    return h
+def euclidean_distance(state):
+    goal = "012345678"
+    euclidean_sum = 0
+    for s in state:
+        current_index = state.find(s)
+        goal_index = goal.find(s)
+        euclidean_sum = euclidean_sum + sqrt(
+            ((current_index % 3) - (goal_index % 3)) ** 2 + ((current_index // 3) - (goal_index // 3)) ** 2)
+    return euclidean_sum
 
 
 def a_star_md(initial_state):
@@ -148,19 +140,19 @@ def a_star_md(initial_state):
             elif child in frontier:
                 if frontier[child] > get_state_manhattan_distance(child):
                     frontier[child] = get_state_manhattan_distance(child)
-
     return []
 
 
 def a_star_ed(initial_state):
-    frontier = heapdict()
-    frontier[initial_state] = euclidesDistance(initial_state)
+    frontier = heapdict()  # optimized priority queue using hashing
+    frontier[initial_state] = euclidean_distance(initial_state)
 
     explored = set()
     parent_map = {}
 
     while len(frontier) > 0:
-        prev_cost = frontier.peekitem()[1] - euclidesDistance(frontier.peekitem()[0])
+        prev_cost = frontier.peekitem()[1] - euclidean_distance(
+            frontier.peekitem()[0])  # to get the cost of the parent node
         state = frontier.popitem()[0]
         explored.add(state)
 
@@ -170,10 +162,10 @@ def a_star_ed(initial_state):
         for child in generate_children(state):
             if child not in frontier and child not in explored:
                 parent_map[child] = state
-                frontier[child] = euclidesDistance(child) + prev_cost + 1
+                frontier[child] = euclidean_distance(child) + prev_cost + 1  # f(n) = h(n) + c(n)
             elif child in frontier:
-                if frontier[child] > euclidesDistance(child):
-                    frontier[child] = euclidesDistance(child)
+                if frontier[child] > euclidean_distance(child):
+                    frontier[child] = euclidean_distance(child)
 
     return []
 
@@ -191,32 +183,12 @@ def check_solvable(state):
 
 
 if __name__ == '__main__':
-    # easy solvable games
-    # game1 = bfs("125340678")
-    #     game2 = bfs("102345678")
-    # game3 = bfs("312045678")
-    # game4 = a_star_md("812045673")
-    # print_path(game4)=
-    # print("h = "+str(get_state_manhattan_distance("102345678")))
-    # initial_state = input("Enter Initial State : ")
-    #
-    #
-    # print("Choose Algorithm to solve ")
-    # print("1 - BFS    2 - DFS     3 - A*(Manhattan distance) ")
-    # alg = input("Enter your choice : ")
-    # if not check_solvable(initial_state):
-    #     print("Not Solvable")
-    #     exit(0)
-    #
-    # if alg == 1:
-    #     game = bfs(initial_state)
-    # elif alg == 2:
-    #     game = dfs(initial_state)
-    # elif alg == 3:
-    #     game = a_star_md(initial_state)
 
-    # game = a_star_ed("182043765")
-    game2 = a_star_ed("013425786")
-    print("omar")
-
-    print_path(game2)
+    test_games = ["013425786", "125340678", "312045678", "182043765", "812045673"]  # Solvable initial states
+    test_unsolvable = "812043765"
+    game = test_games[1]
+    if check_solvable(game):
+        solution = a_star_md(game)
+        print_path(solution)
+    else:
+        print("Not Solvable")
