@@ -217,5 +217,6 @@ if __name__ == '__main__':
 
     # game = a_star_ed("182043765")
     game2 = a_star_ed("013425786")
+    print("omar")
 
     print_path(game2)
