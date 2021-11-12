@@ -71,10 +71,10 @@ class Node:
         return state
 
     def expand(self):
-        self.move_left()
-        self.move_right()
         self.move_up()
         self.move_down()
+        self.move_left()
+        self.move_right()
         return self.children
 
     def get_state(self):

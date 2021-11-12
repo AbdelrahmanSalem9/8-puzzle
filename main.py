@@ -1,4 +1,5 @@
 import collections
+import node
 import algorithm as algo
 
 if __name__ == '__main__':
@@ -9,7 +10,7 @@ if __name__ == '__main__':
 
         while True:  # do while to check if correct
             initial_state = input("insert initial state: ")
-            freq = collections.Counter(initial_state)
+            freq = collections.Counter(initial_state)  # check unique
             if len(initial_state) == len(freq) == 9 and initial_state.isdecimal():
                 break
             print("wrong initial state")
@@ -41,5 +42,3 @@ if __name__ == '__main__':
 
             if h == 1 or h == 2:
                 solution = algo.solver(initial_state, switch, h)
-
-        # print("memory used =  " + str(solution[-1]) + " Byte")

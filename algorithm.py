@@ -7,9 +7,9 @@ from heapdict import heapdict
 import node
 
 
-# TODO: Search algorithms BFS, DFS ,A*
+# TODO: Search algorithms BFS, DFS_node ,A*
 # Node Implementation
-def BFS(initial_state):
+def BFS_node(initial_state):
     root = node.Node(initial_state)
     frontier = queue.Queue()
     frontier.put(root)
@@ -30,7 +30,7 @@ def BFS(initial_state):
     return None
 
 
-def DFS(initial_state):
+def DFS_node(initial_state):
     root = node.Node(initial_state)
     frontier = queue.LifoQueue()
     frontier.put(root)  # node
@@ -250,10 +250,10 @@ def euclides_distance(state, goal="012345678", col=3):
 def solver(initial_state, algorithm, heuristic=None):
     solution = None
     if algorithm == 1:
-        # solution = BFS(initial_state)
-        solution = bfs(initial_state)
+        # solution = BFS_node(initial_state)
+        bfs(initial_state)
     elif algorithm == 2:
-        # solution = DFS(initial_state)
+        # solution = DFS_node(initial_state)
         solution = dfs(initial_state)
     elif algorithm == 3:
         if heuristic == 0:
