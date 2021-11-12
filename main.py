@@ -1,6 +1,5 @@
 import collections
 import algorithm as algo
-import node
 
 if __name__ == '__main__':
     solver = algo
@@ -28,9 +27,8 @@ if __name__ == '__main__':
             print(initial_state + " Cannot be solved")
             continue
 
-        root = node.Node(initial_state)
         if switch == 1 or switch == 2:
-            solution = algo.solver(root, switch)
+            solution = algo.solver(initial_state, switch)
         elif switch == 3:
             while True:
                 h = int(input("choose heuristic:\n"
@@ -42,6 +40,6 @@ if __name__ == '__main__':
                 print("invalid")
 
             if h == 1 or h == 2:
-                solution = algo.solver(root, switch, h)
+                solution = algo.solver(initial_state, switch, h)
 
-        print("memory used =  " + str(solution[-1]) + " Byte")
+        # print("memory used =  " + str(solution[-1]) + " Byte")

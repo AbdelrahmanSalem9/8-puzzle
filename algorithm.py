@@ -4,15 +4,16 @@ import queue
 import time
 import psutil
 from heapdict import heapdict
-from node import swap
+import node
 
 
 # TODO: Search algorithms BFS, DFS ,A*
+# Node Implementation
 def BFS(initial_state):
-    start_time = time.time()
+    root = node.Node(initial_state)
     frontier = queue.Queue()
-    frontier.put(initial_state)
-    frontier_state = {initial_state.get_state(): True}
+    frontier.put(root)
+    frontier_state = {root.get_state(): True}
     explored = set()
 
     while not frontier.empty():
@@ -30,9 +31,10 @@ def BFS(initial_state):
 
 
 def DFS(initial_state):
+    root = node.Node(initial_state)
     frontier = queue.LifoQueue()
-    frontier.put(initial_state)  # node
-    frontier_state = {initial_state.get_state(): True}  # string
+    frontier.put(root)  # node
+    frontier_state = {root.get_state(): True}  # string
     explored = set()
 
     while not frontier.empty():
@@ -49,6 +51,7 @@ def DFS(initial_state):
     return None
 
 
+# Parent Map Implementation
 def bfs(initial_state):
     start_time = time.time()
     frontier = [initial_state]
@@ -131,19 +134,19 @@ def generate_children(state):
 
     # Check Move up
     if index > 2:
-        children.append(swap(state, index, index - 3))
+        children.append(node.swap(state, index, index - 3))
 
     # Check Move down
     if index < 6:
-        children.append((swap(state, index, index + 3)))
+        children.append((node.swap(state, index, index + 3)))
 
     # Check Left move
     if index % 3 > 0:
-        children.append(swap(state, index, index - 1))
+        children.append(node.swap(state, index, index - 1))
 
     # Check Right move
     if index % 3 < 2:
-        children.append(swap(state, index, index + 1))
+        children.append(node.swap(state, index, index + 1))
 
     return children
 
@@ -246,18 +249,16 @@ def euclides_distance(state, goal="012345678", col=3):
 
 def solver(initial_state, algorithm, heuristic=None):
     solution = None
-    start_mem = psutil.virtual_memory()
     if algorithm == 1:
         # solution = BFS(initial_state)
-        solution = bfs(initial_state.get_state())
+        solution = bfs(initial_state)
     elif algorithm == 2:
         # solution = DFS(initial_state)
-        solution = dfs(initial_state.get_state())
+        solution = dfs(initial_state)
     elif algorithm == 3:
         if heuristic == 0:
-            A_star(initial_state.get_state(), manhattan_distance)
+            A_star(initial_state, manhattan_distance)
         else:
-            A_star(initial_state.get_state(), euclides_distance)
-    end_mem = psutil.virtual_memory()
-    delta = end_mem.used - start_mem.used
-    return solution, delta
+            A_star(initial_state, euclides_distance)
+    end_mem = psutil.virtual_memory().used
+    return solution, end_mem
