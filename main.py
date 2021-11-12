@@ -1,4 +1,5 @@
 import time
+from collections import deque
 from math import sqrt
 
 from heapdict import heapdict
@@ -74,10 +75,14 @@ def bfs(initial_state):
     frontier = [initial_state]
     explore = set()
     parent_map = {}
+    frontier_state = {}
+    frontier_state[initial_state] = True
     depth = 0
     while len(frontier) != 0:
         state = frontier.pop(0)
         explore.add(state)
+        frontier_state.pop(state)
+
 
         if state == "012345678":
             return find_path(parent_map, initial_state, len(explore), depth, time.time() - start_time)
@@ -85,8 +90,9 @@ def bfs(initial_state):
         else:
             depth += 1
             for child in generate_children(state):
-                if child not in frontier and child not in explore:
+                if child not in frontier_state and child not in explore:
                     parent_map[child] = state
+                    frontier_state[child] = True
                     frontier.append(child)
 
     return []
@@ -94,22 +100,28 @@ def bfs(initial_state):
 
 def dfs(initial_state):
     start_time = time.time()
-    frontier = [initial_state]
+    frontier = deque()
+    frontier.append(initial_state)
+    frontier_state = {}
+    frontier_state[initial_state] = True
+
     explore = set()
     parent_map = {}
     depth = 0
     while len(frontier) != 0:
         state = frontier.pop()  # Stack behaviour
+        frontier_state.pop(state)
         explore.add(state)
         depth += 1
-        print(state)
+
         if state == "012345678":
             return find_path(parent_map, initial_state, len(explore), depth, time.time() - start_time)
         else:
-            for child in generate_children(state):
-                if child not in frontier and child not in explore:
+            for child in reversed(generate_children(state)):
+                if child not in frontier_state and child not in explore:
                     parent_map[child] = state
-                    frontier.insert(len(frontier) - 1, child)
+                    frontier_state[child] = True
+                    frontier.append(child)
 
     return []
 
@@ -208,13 +220,22 @@ def check_solvable(state):
 
 if __name__ == '__main__':
 
-    test_games = ["013425786", "125340678", "312045678", "182043765", "812045673",
-                  "312045678"]  # Solvable initial states
-    test_unsolvable = "812043765"
-    game = test_games[0]
-    if check_solvable(game):
-        bfs(game)
-        # print_path(solution)
+    # test_games = ["013425786", "125340678", "312045678", "182043765", "812045673",
+    #               "312045678", "012345678"]  # Solvable initial states
+    # test_unsolvable = "812043765"
+    # game = test_games[0]
 
+    initial_state = input("Enter initial state : ")
+    print("1-BFS    2-DFS   3-A*(manhattan)     4-A*(Euclidean)")
+    alg = int(input("Choose Algorithm to solve : : "))
+    if check_solvable(initial_state):
+        if alg == 1:
+            bfs(initial_state)
+        elif alg == 2:
+            dfs(initial_state)
+        elif alg == 3:
+            a_star_md(initial_state)
+        elif alg == 4:
+            a_star_ed(initial_state)
     else:
         print("Not Solvable")
