@@ -51,7 +51,7 @@ def print_path(game, cost, nodes_explored, depth, time_taken):
                 print(state[i], end=" ")
         print("---------------------------------------------")
     print("Cost = " + str(cost))
-    print("Depth = " + str(depth - 1))
+    print("Depth = " + str(depth))
     print("Nodes Explored = " + str(nodes_explored))
     print("Running Time = " + str(time_taken))
     # print("Cost = "+str(cost) + "  Nodes Explored = "+str(nodes_explored))
@@ -75,25 +75,27 @@ def bfs(initial_state):
     frontier = [initial_state]
     explore = set()
     parent_map = {}
-    frontier_state = {}
-    frontier_state[initial_state] = True
-    depth = 0
+    frontier_state = {initial_state: True}
+    depth_map = {initial_state: 0}
+    max_depth = 0
     while len(frontier) != 0:
         state = frontier.pop(0)
         explore.add(state)
         frontier_state.pop(state)
 
-
         if state == "012345678":
-            return find_path(parent_map, initial_state, len(explore), depth, time.time() - start_time)
+            return find_path(parent_map, initial_state, len(explore), max_depth, time.time() - start_time)
 
         else:
-            depth += 1
+
             for child in generate_children(state):
                 if child not in frontier_state and child not in explore:
                     parent_map[child] = state
                     frontier_state[child] = True
                     frontier.append(child)
+                    depth_map[child] = depth_map[state] + 1
+                    if depth_map[child] > max_depth:
+                        max_depth = depth_map[child]
 
     return []
 
@@ -102,26 +104,27 @@ def dfs(initial_state):
     start_time = time.time()
     frontier = deque()
     frontier.append(initial_state)
-    frontier_state = {}
-    frontier_state[initial_state] = True
-
+    frontier_state = {initial_state: True}
     explore = set()
     parent_map = {}
-    depth = 0
+    depth_map = {initial_state: 0}
+    max_depth = 0
     while len(frontier) != 0:
         state = frontier.pop()  # Stack behaviour
         frontier_state.pop(state)
         explore.add(state)
-        depth += 1
 
         if state == "012345678":
-            return find_path(parent_map, initial_state, len(explore), depth, time.time() - start_time)
+            return find_path(parent_map, initial_state, len(explore), max_depth, time.time() - start_time)
         else:
             for child in reversed(generate_children(state)):
                 if child not in frontier_state and child not in explore:
                     parent_map[child] = state
                     frontier_state[child] = True
                     frontier.append(child)
+                    depth_map[child] = depth_map[state] + 1
+                    if depth_map[child] > max_depth:
+                        max_depth = depth_map[child]
 
     return []
 
@@ -153,26 +156,31 @@ def a_star_md(initial_state):
 
     frontier = heapdict()
     frontier[initial_state] = get_state_manhattan_distance(initial_state)
-
     explored = set()
     parent_map = {}
-    depth = 0
+    depth_map = {initial_state: 0}
+    max_depth = 0
     while len(frontier) > 0:
         prev_cost = frontier.peekitem()[1] - get_state_manhattan_distance(frontier.peekitem()[0])
         state = frontier.popitem()[0]
         explored.add(state)
-        depth += 1
 
         if state == "012345678":
-            return find_path(parent_map, initial_state, len(explored), depth, time.time() - start_time)
+            return find_path(parent_map, initial_state, len(explored), max_depth, time.time() - start_time)
 
         for child in generate_children(state):
             if child not in frontier and child not in explored:
                 parent_map[child] = state
                 frontier[child] = get_state_manhattan_distance(child) + prev_cost + 1
+
+                depth_map[child] = depth_map[state] + 1
+                if depth_map[child] > max_depth:
+                    max_depth = depth_map[child]
+
             elif child in frontier:
                 if frontier[child] > get_state_manhattan_distance(child):
                     frontier[child] = get_state_manhattan_distance(child)
+
     return []
 
 
@@ -180,25 +188,30 @@ def a_star_ed(initial_state):
     start_time = time.time()
     frontier = heapdict()  # optimized priority queue using hashing
     frontier[initial_state] = euclidean_distance(initial_state)
-
     explored = set()
     parent_map = {}
-    depth = 0
+
+    depth_map = {initial_state: 0}
+    max_depth = 0
 
     while len(frontier) > 0:
         prev_cost = frontier.peekitem()[1] - euclidean_distance(
             frontier.peekitem()[0])  # to get the cost of the parent node
         state = frontier.popitem()[0]
         explored.add(state)
-        depth += 1
 
         if state == "012345678":
-            return find_path(parent_map, initial_state, len(explored), depth, time.time() - start_time)
+            return find_path(parent_map, initial_state, len(explored), max_depth, time.time() - start_time)
 
         for child in generate_children(state):
             if child not in frontier and child not in explored:
                 parent_map[child] = state
                 frontier[child] = euclidean_distance(child) + prev_cost + 1  # f(n) = h(n) + c(n)
+
+                depth_map[child] = depth_map[state] + 1
+                if depth_map[child] > max_depth:
+                    max_depth = depth_map[child]
+
             elif child in frontier:
                 if frontier[child] > euclidean_distance(child):
                     frontier[child] = euclidean_distance(child)
