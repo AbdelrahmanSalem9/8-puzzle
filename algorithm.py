@@ -248,14 +248,16 @@ def solver(initial_state, algorithm, heuristic=None):
     solution = None
     start_mem = psutil.virtual_memory()
     if algorithm == 1:
-        solution = BFS(initial_state)
+        # solution = BFS(initial_state)
+        solution = bfs(initial_state.get_state())
     elif algorithm == 2:
-        solution = DFS(initial_state)
+        # solution = DFS(initial_state)
+        solution = dfs(initial_state.get_state())
     elif algorithm == 3:
         if heuristic == 0:
-            pass
+            A_star(initial_state.get_state(), manhattan_distance)
         else:
-            pass
-
+            A_star(initial_state.get_state(), euclides_distance)
     end_mem = psutil.virtual_memory()
-    return solution, (start_mem.used - end_mem.used)
+    delta = end_mem.used - start_mem.used
+    return solution, delta

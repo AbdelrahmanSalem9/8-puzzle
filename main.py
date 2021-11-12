@@ -41,11 +41,7 @@ if __name__ == '__main__':
                     break
                 print("invalid")
 
-            if h == 1:
-                algo.A_star(initial_state, algo.manhattan_distance)
-            if h == 2:
-                algo.A_star(initial_state, algo.euclides_distance)
+            if h == 1 or h == 2:
+                solution = algo.solver(root, switch, h)
 
-        # for child in root.get_list_to_root():
-        #     child.print_state()
-        # print("memory used =  " + str(end.used - start.used) + "Byte")
+        print("memory used =  " + str(solution[-1]) + " Byte")
