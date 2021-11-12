@@ -78,16 +78,17 @@ def bfs(initial_state):
     while len(frontier) != 0:
         state = frontier.pop(0)
         explore.add(state)
-        depth += 1
 
         if state == "012345678":
             return find_path(parent_map, initial_state, len(explore), depth, time.time() - start_time)
 
         else:
+            depth += 1
             for child in generate_children(state):
                 if child not in frontier and child not in explore:
                     parent_map[child] = state
                     frontier.append(child)
+
     return []
 
 
@@ -101,13 +102,15 @@ def dfs(initial_state):
         state = frontier.pop()  # Stack behaviour
         explore.add(state)
         depth += 1
+        print(state)
         if state == "012345678":
             return find_path(parent_map, initial_state, len(explore), depth, time.time() - start_time)
         else:
             for child in generate_children(state):
                 if child not in frontier and child not in explore:
                     parent_map[child] = state
-                    frontier.append(child)
+                    frontier.insert(len(frontier) - 1, child)
+
     return []
 
 
@@ -208,9 +211,9 @@ if __name__ == '__main__':
     test_games = ["013425786", "125340678", "312045678", "182043765", "812045673",
                   "312045678"]  # Solvable initial states
     test_unsolvable = "812043765"
-    game = test_games[5]
+    game = test_games[0]
     if check_solvable(game):
-        dfs(game)
+        bfs(game)
         # print_path(solution)
 
     else:
