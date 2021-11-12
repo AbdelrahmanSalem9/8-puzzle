@@ -7,7 +7,7 @@ class Node:
     *********
     """
 
-    def __init__(self, state, parent=None, action="initial", col=3):
+    def __init__(self, state, parent=None, action="", col=3):
         self.state = state
         self.index = state.find("0")
         self.parent = parent
@@ -84,9 +84,11 @@ class Node:
         return self.children
 
     def print_state(self):
+        print(self.action)
         print(self.state[0:self.col])
         print(self.state[self.col:self.col + self.col])
         print(self.state[self.col + self.col:len(self.state)])
+        print("Depth:" + str(self.get_depth()))
         print("-------------------------")
 
     def get_list_to_root(self):
@@ -96,6 +98,9 @@ class Node:
             temp = temp.parent
             lst.append(temp)
         return lst[::-1]
+
+    def get_depth(self):
+        return self.depth
 
 
 def swap(s, i, j):
